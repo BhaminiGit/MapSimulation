@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>CUSTOM MAP SIMULATOR </title>
+		
+		<style type="text/css">
+
+			body {
+
+			  background-color: #baffc7;
+
+			}
+
+			div.actualMap {
+
+
+
+			  border: 2px solid black;
+			  min-height: 550px;
+			  max-height: 550px;
+			  min-width: 1000px;
+			  max-width: 1000px;
+			}
+
+			.place {
+			  position: fixed;
+			  border-radius: 50%;
+
+
+			}
+
+			.place:focus {
+			  border: 2px solid black;
+
+			}
+
+			.place:hover {
+			  border: 2px solid red;
+
+			}
+
+			.lineClass {
+			  stroke: rgb(0, 0, 0);
+			  stroke-width: 3;
+
+			}
+
+			.lineClass: focus {
+			  stroke: rgb(0, 0, 0);
+			  stroke-width: 3;
+
+			}
+
+
+			.lineClass:hover {
+			  stroke: red;
+			  stroke-width: 3;
+			}
+
+		</style>
+
+		<script type="text/javascript">
+			function editMap(event) {
+				  //alert("X: "+ event.clientX + " Y: " + event.clientY);
+
+				  var radios = document.getElementsByName('optionsRadio');
+
+				  for (var i = 0, length = radios.length; i < length; i++) {
+				    if (radios[i].checked) {
+				      // do whatever you want with the checked radio
+				      if (radios[i].value == "addPlace") {
+
+				        var x_pos = event.clientX;
+				        var y_pos = event.clientY;
+
+				        var circle = document.createElement("div");
+				        circle.setAttribute("id", "place" + valueCounter);
+				        circle.setAttribute("value", "place" + valueCounter);
+				        valueCounter++;
+				        circle.style.position = "absolute";
+				        circle.style.left = x_pos-25 + 'px';
+				        circle.style.top = y_pos-25 + 'px';
+				        circle.style.background = "pink";
+				        circle.style.minWidth = "50px";
+				        circle.style.minHeight = "50px";
+				        circle.classList.add("place");
+				        circle.addEventListener("click", placeSelected);
+
+
+				        document.getElementById("actualMap").appendChild(circle);
+				        // only one radio can be logically checked, don't check the rest
+				        break;
+				      }
+				    }
+				  }
+
+
+				}
+
+			function placeSelected(e) {
+
+			  //a point was previously selected and we need to add a road between previous point and this one
+			  if (roadPoint) {
+			    alert("Calculate Distance");
+			 
+			    var newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+			    var x2 = e.target.offsetLeft;
+					var y2 = e.target.offsetTop;
+			    newLine.setAttribute('id', 'line' + roadCounter);
+			    newLine.setAttribute('value','line'+ roadCounter);
+			    newLine.setAttribute('x1', x1 +18);
+			    newLine.setAttribute('y1', y1+18);
+			    newLine.setAttribute('x2', x2 + 18);
+			    newLine.setAttribute('y2', y2+18);
+			    document.getElementById("placeClicked").innerText = "" + x1 + "," + y1 + "   " + x2 + "," + y2;
+			    newLine.classList.add("lineClass");
+			    newLine.addEventListener("click",lineClicked);
+			  	
+			    document.getElementById("routes").appendChild(newLine); 
+					roadCounter++;
+
+			    document.getElementById("radioButtonsList").style.display = "unset";
+			    roadPoint = false;
+			    return;
+			  }
+
+				//we want to set only the one we are clicking to be yellow. the others have to be pink :D
+			  var radios = document.getElementsByName('optionsRadio');
+			  if (!radios[0].checked) {
+			    var places = document.getElementsByClassName("place");
+			    for (var i = 0; i < places.length; i++) {
+			      places[i].style.background = "pink";
+			    }
+			    e.target.style.background = "yellow";
+
+			  }
+				
+			  //see what action we need to do if point is clicked and radio button clicked
+			  for (var i = 0, length = radios.length; i < length; i++) {
+			    if (radios[i].checked) {
+			      // do whatever you want with the checked radio
+			      var choice = radios[i].value;
+
+			      if (choice == "changeIt") {
+			        if (roadPoint) {
+			          roadPoint = false;
+			        }
+			        var changeValue = prompt("What would you like to change it's name to?", e.target.value);
+			        break;
+			      }
+
+			      if (choice == "addRoad") {
+			        roadPoint = true;
+			        document.getElementById("radioButtonsList").style.display = "none";
+			        val1 = e.target.value;
+			        x1 = e.target.offsetLeft;
+			        y1 = e.target.offsetTop;
+			        alert("(" + x1 + " " + y1 + " " + "Click on another place");
+			        break;
+			      }
+
+			      if (choice == "move") {
+			        alert("move object");
+			        if (roadPoint) {
+			          roadPoint = false;
+			        }
+			        break;
+			      }
+
+			    }
+
+			  }
+			}
+
+			function lineClicked(e){
+				alert("the line was clicked " + e.target.id);
+			}
+
+			function setup() {
+			    document.getElementById("actualMap").addEventListener("click", editMap);
+
+			  }
+
+
+			  window.addEventListener("load", setup, true);
+			  var valueCounter = 0;
+			  var roadCounter = 0;
+			  var roadPoint = false;
+			  var x1, y1, val1;
+
+
+
+			</script>
+
+
+	</head>
+	<body>
+
+		 <div class="actualMap" id="actualMap">
+
+	    <svg id="routes" width="1000" height="550" version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>
+
+	    </div>
+	    x: 7 - 1510
+	    y: 7 - 561
+	    <div class="radioButtonsList" id="radioButtonsList">
+
+	      <input type="radio" id="addPlace" name="optionsRadio" value="addPlace">
+	      <label for="addPlace">Add A Place</label><br>
+
+	      <input type="radio" id="addRoad" name="optionsRadio" value="addRoad">
+	      <label for="addRoad">Add A Road</label><br>
+
+	      <input type="radio" id="changeIt" name="optionsRadio" value="changeIt">
+	      <label for="changeIt">Change</label><br>
+
+	      <input type="radio" id="move" name="optionsRadio" value="move">
+	      <label for="move">Move</label><br>
+
+	      <p id="placeClicked">STUFF</p>
+
+	    </div>
+
+
+
+	</body>
+</html>
